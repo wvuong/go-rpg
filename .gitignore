@@ -1,0 +1,26 @@
+# Binaries for programs
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, can be ignored
+*.test
+
+# Go workspace file
+go.work.lock
+
+# Optional: Vendor directory (depends on project practices)
+vendor/
+
+# Environment files
+.env
+
+# IDE-related files and directories (common examples)
+.idea/		# for GoLand/IntelliJ
+.vscode/	# for VS Code
+.history/
+*.swp
+
+.DS_Store
