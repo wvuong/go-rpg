@@ -8,6 +8,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/wvuong/gogame/images"
 )
 
@@ -20,7 +21,8 @@ const (
 )
 
 var (
-	tilesImage *ebiten.Image
+	tilesImage  *ebiten.Image
+	spriteImage *ebiten.Image
 )
 
 func init() {
@@ -30,17 +32,46 @@ func init() {
 		log.Fatal(err)
 	}
 	tilesImage = ebiten.NewImageFromImage(img)
+
+	img, _, err = image.Decode(bytes.NewReader(images.Sprite_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	spriteImage = ebiten.NewImageFromImage(img)
+}
+
+type Sprite struct {
+	image *ebiten.Image
+	x     int
+	y     int
 }
 
 type Game struct {
 	layers [][]int
+	player *Sprite
 }
 
 func (g *Game) Update() error {
+	speed := 5
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		g.player.y -= speed
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		g.player.y += speed
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		g.player.x -= speed
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		g.player.x += speed
+	}
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	// draw layers
 	for _, l := range g.layers {
 		for c := range cols {
 			for r := range rows {
@@ -58,6 +89,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+
+	// draw 48x64 sprite
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(g.player.x), float64(g.player.y))
+	screen.DrawImage(g.player.image, op)
 
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS()))
 }
@@ -95,8 +131,12 @@ func main() {
 	}
 	//  0. 1. 2. 3. 4. 5. 6. 7.
 
+	rect := image.Rect(48, 128, 96, 192)
+	sprite := spriteImage.SubImage(rect).(*ebiten.Image)
+
 	g := &Game{
 		layers: [][]int{layer1, layer2},
+		player: &Sprite{image: sprite, x: 100, y: 100},
 	}
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
