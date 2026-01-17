@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	tilesImage   *ebiten.Image
-	spritesImage *ebiten.Image
+	tileSheet   *ebiten.Image
+	spriteSheet *ebiten.Image
 )
 
 func init() {
@@ -21,17 +21,17 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tilesImage = ebiten.NewImageFromImage(img)
+	tileSheet = ebiten.NewImageFromImage(img)
 
 	img, _, err = image.Decode(bytes.NewReader(images.Sprite_png))
 	if err != nil {
 		log.Fatal(err)
 	}
-	spritesImage = ebiten.NewImageFromImage(img)
+	spriteSheet = ebiten.NewImageFromImage(img)
 }
 
 func main() {
-	g := game.NewGame(tilesImage, spritesImage)
+	g := game.NewGame(tileSheet, spriteSheet)
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
