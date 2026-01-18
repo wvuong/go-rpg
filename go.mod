@@ -2,7 +2,7 @@ module github.com/wvuong/gogame
 
 go 1.25.5
 
-require github.com/hajimehoshi/ebiten/v2 v2.9.5
+require github.com/hajimehoshi/ebiten/v2 v2.9.7
 
 require (
 	github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 // indirect
@@ -12,8 +12,9 @@ require (
 	github.com/hajimehoshi/ebiten v1.12.13 // indirect
 	github.com/jezek/xgb v1.1.1 // indirect
 	golang.org/x/exp v0.0.0-20190731235908-ec7cb31e5a56 // indirect
-	golang.org/x/image v0.31.0 // indirect
+	golang.org/x/image v0.35.0 // indirect
 	golang.org/x/mobile v0.0.0-20210208171126-f462b3930c8f // indirect
-	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 )

@@ -46,7 +46,7 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 		3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 3, // 13
 	}
 	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
-	tileMap := NewMap([][]int{layer1}, cols, rows)
+	tileMap := NewMap([][]int{layer1}, cols, rows, tileSize)
 
 	rect := image.Rect(48, 128, 96, 192)
 	sprite := spriteSheet.SubImage(rect).(*ebiten.Image)
@@ -54,17 +54,7 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 	camera := NewCamera(screenWidth, screenHeight, cols, rows, tileSize)
 
 	player := &Player{
-		Sprite: &Sprite{
-			Image: sprite,
-			Position: &Vector{
-				X: 100,
-				Y: 100,
-			},
-			ScreenPosition: &Vector{
-				X: 0,
-				Y: 0,
-			},
-		},
+		Sprite: NewSprite(sprite, 100, 100),
 	}
 
 	camera.CenterOn(player.Sprite)
@@ -80,17 +70,53 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 }
 
 func (g *Game) Update() error {
+	// move player with arrow keys
+	var dirX, dirY float64
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		g.player.Sprite.Position.Y -= 16
+		dirY = -16
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		g.player.Sprite.Position.Y += 16
+		dirY = 16
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		g.player.Sprite.Position.X -= 16
+		dirX = -16
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		g.player.Sprite.Position.X += 16
+		dirX = 16
+	}
+
+	g.player.Sprite.Position.X += dirX
+	g.player.Sprite.Position.Y += dirY
+
+	// check for collisions
+	left := int(g.player.Sprite.Position.X - float64(g.player.Sprite.Dx)/2)
+	right := int(g.player.Sprite.Position.X + float64(g.player.Sprite.Dx)/2 - 1)
+	top := int(g.player.Sprite.Position.Y - float64(g.player.Sprite.Dy)/2)
+	bottom := int(g.player.Sprite.Position.Y + float64(g.player.Sprite.Dy)/2 - 1)
+	g.player.Left = left
+	g.player.Right = right
+	g.player.Top = top
+	g.player.Bottom = bottom
+
+	collision := g.tileMap.isSolidTileAtXY(left, top) ||
+		g.tileMap.isSolidTileAtXY(right, top) ||
+		g.tileMap.isSolidTileAtXY(right, bottom) ||
+		g.tileMap.isSolidTileAtXY(left, bottom)
+
+	if collision {
+		if dirY > 0 {
+			row := g.tileMap.getRow(bottom)
+			g.player.Sprite.Position.Y = float64(g.player.Sprite.Dy/2) + g.tileMap.getY(row)
+		} else if dirY < 0 {
+			row := g.tileMap.getRow(top)
+			g.player.Sprite.Position.Y = float64(g.player.Sprite.Dy/2) + g.tileMap.getY(row+1)
+		} else if dirX > 0 {
+			col := g.tileMap.getCol(right)
+			g.player.Sprite.Position.X = float64(g.player.Sprite.Dx/2) + g.tileMap.getX(col)
+		} else if dirX < 0 {
+			col := g.tileMap.getCol(left)
+			g.player.Sprite.Position.X = float64(g.player.Sprite.Dx/2) + g.tileMap.getX(col+1)
+		}
 	}
 
 	// clamp player position to map bounds
@@ -135,19 +161,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	// draw player 48x64 sprite
+	// center sprite on its position
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(g.player.Sprite.ScreenPosition.X), float64(g.player.Sprite.ScreenPosition.Y))
+	op.GeoM.Translate(g.player.Sprite.ScreenPosition.X-float64(g.player.Sprite.Dx)/2,
+		g.player.Sprite.ScreenPosition.Y-float64(g.player.Sprite.Dy)/2)
 	screen.DrawImage(g.player.Sprite.Image, op)
 
-	/*
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f, (%d, %d) -> (%d, %d)",
-			ebiten.ActualTPS(), startCol, startRow, endCol, endRow))
-	*/
-
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("Player: (%.2f, %.2f)\nCamera: (%.2f, %.2f)\nH * W: (%d, %d)",
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("Player: (%.2f, %.2f) (L%d, R%d, T%d, B%d)\nCamera: (%.2f, %.2f)",
 		g.player.Sprite.Position.X, g.player.Sprite.Position.Y,
-		g.camera.Position.X, g.camera.Position.Y,
-		screenHeight, screenWidth))
+		g.player.Left, g.player.Right, g.player.Top, g.player.Bottom,
+		g.camera.Position.X, g.camera.Position.Y))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

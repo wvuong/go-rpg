@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bytes"
-	"image"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	assets "github.com/wvuong/gogame/assets"
 	"github.com/wvuong/gogame/game"
-	"github.com/wvuong/gogame/images"
 )
 
 var (
@@ -16,18 +14,8 @@ var (
 )
 
 func init() {
-	// Decode an image from the image file's byte slice.
-	img, _, err := image.Decode(bytes.NewReader(images.Tiles_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	tileSheet = ebiten.NewImageFromImage(img)
-
-	img, _, err = image.Decode(bytes.NewReader(images.Sprite_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	spriteSheet = ebiten.NewImageFromImage(img)
+	tileSheet = assets.Tiles_png
+	spriteSheet = assets.Sprite_png
 }
 
 func main() {
