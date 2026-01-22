@@ -2,10 +2,10 @@ package game
 
 type Player struct {
 	Sprite *Sprite
-	Left   int
-	Right  int
-	Top    int
-	Bottom int
+	Left   float64
+	Right  float64
+	Top    float64
+	Bottom float64
 }
 
 func NewPlayer(sprite *Sprite) *Player {
