@@ -21,6 +21,7 @@ const (
 	screenHeight = 8 * tileSize
 	mapWidth     = cols * tileSize
 	mapHeight    = rows * tileSize
+	playerSpeed  = 2
 )
 
 type Game struct {
@@ -52,15 +53,42 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
 	tileMap := NewMap([][]int{layer1}, cols, rows, tileSize)
 
-	rect := image.Rect(48, 128, 96, 192)
-	sprite := spriteSheet.SubImage(rect).(*ebiten.Image)
+	facingDownSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+		image.Rect(0, 128, 48, 192),
+		image.Rect(48, 128, 96, 192),
+		image.Rect(96, 128, 144, 192),
+	})
 
-	camera := NewCamera(screenWidth, screenHeight, cols, rows, tileSize)
+	facingUpSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+		image.Rect(0, 0, 48, 64),
+		image.Rect(48, 0, 96, 64),
+		image.Rect(96, 0, 144, 64),
+	})
 
-	player := &Player{
-		Sprite: NewSprite(sprite, 100, 100),
+	facingLeftSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+		image.Rect(0, 192, 48, 256),
+		image.Rect(48, 192, 96, 256),
+		image.Rect(96, 192, 144, 256),
+	})
+
+	facingRightSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+		image.Rect(0, 64, 48, 128),
+		image.Rect(48, 64, 96, 128),
+		image.Rect(96, 64, 144, 128),
+	})
+
+	directionalSpriteIndex := &DirectionalSpriteIndex{
+		Up:    facingUpSpriteIndex,
+		Down:  facingDownSpriteIndex,
+		Left:  facingLeftSpriteIndex,
+		Right: facingRightSpriteIndex,
 	}
 
+	// create player at position 100, 100
+	player := NewPlayer(tileMap, directionalSpriteIndex, 100, 100)
+
+	// create camera and center on player
+	camera := NewCamera(screenWidth, screenHeight, cols, rows, tileSize)
 	camera.CenterOn(player.Sprite)
 
 	g := &Game{
@@ -75,75 +103,15 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 }
 
 func (g *Game) Update() error {
-	// move player with arrow keys
-	var dirX, dirY float64
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		dirY = -4
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		dirY = 4
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		dirX = -4
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		dirX = 4
-	}
-
 	// toggle debug mode
 	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
 		g.debug.Enabled = !g.debug.Enabled
 	}
 
-	g.player.Sprite.Position.X += dirX
-	g.player.Sprite.Position.Y += dirY
+	// update player
+	g.player.Update()
 
-	// check for collisions
-	// calculate the player's bounding box
-	left := g.player.Sprite.Position.X - float64(g.player.Sprite.Dx)/2
-	right := g.player.Sprite.Position.X + float64(g.player.Sprite.Dx)/2 - 1
-	top := g.player.Sprite.Position.Y - float64(g.player.Sprite.Dy)/2
-	bottom := g.player.Sprite.Position.Y + float64(g.player.Sprite.Dy)/2 - 1
-	g.player.Left = left
-	g.player.Right = right
-	g.player.Top = top
-	g.player.Bottom = bottom
-
-	collision := g.tileMap.isSolidTileAtXY(left, top) ||
-		g.tileMap.isSolidTileAtXY(right, top) ||
-		g.tileMap.isSolidTileAtXY(right, bottom) ||
-		g.tileMap.isSolidTileAtXY(left, bottom)
-
-	if collision {
-		if dirY > 0 {
-			// moving down
-			row := g.tileMap.getRow(bottom)
-			// align player to top edge of tile
-			g.player.Sprite.Position.Y = -float64(g.player.Sprite.Dy)/2 + g.tileMap.getY(row)
-		} else if dirY < 0 {
-			// moving up
-			row := g.tileMap.getRow(top)
-			// align player to bottom edge of tile
-			g.player.Sprite.Position.Y = float64(g.player.Sprite.Dy)/2 + g.tileMap.getY(row+1)
-		} else if dirX > 0 {
-			// moving right
-			col := g.tileMap.getCol(right)
-			// align player to left edge of tile
-			g.player.Sprite.Position.X = -float64(g.player.Sprite.Dx)/2 + g.tileMap.getX(col)
-		} else if dirX < 0 {
-			// moving left
-			col := g.tileMap.getCol(left)
-			// align player to right edge of tile
-			g.player.Sprite.Position.X = float64(g.player.Sprite.Dx)/2 + g.tileMap.getX(col+1)
-		}
-	}
-
-	// clamp player position to map bounds
-	x := math.Max(0, math.Min(g.player.Sprite.Position.X, mapWidth))
-	y := math.Max(0, math.Min(g.player.Sprite.Position.Y, mapHeight))
-	g.player.Sprite.Position.X = x
-	g.player.Sprite.Position.Y = y
-
+	// update camera position
 	g.camera.Update()
 
 	return nil
