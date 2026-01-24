@@ -29,6 +29,7 @@ type Game struct {
 	tileMap     *TileMap
 	camera      *Camera
 	player      *Player
+	debug       *Debug
 }
 
 func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
@@ -67,6 +68,7 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 		tileMap:   tileMap,
 		camera:    camera,
 		player:    player,
+		debug:     &Debug{Enabled: false},
 	}
 
 	return g
@@ -75,17 +77,22 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 func (g *Game) Update() error {
 	// move player with arrow keys
 	var dirX, dirY float64
-	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		dirY = -16
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		dirY = -4
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		dirY = 16
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		dirY = 4
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		dirX = -16
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		dirX = -4
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		dirX = 16
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		dirX = 4
+	}
+
+	// toggle debug mode
+	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
+		g.debug.Enabled = !g.debug.Enabled
 	}
 
 	g.player.Sprite.Position.X += dirX
@@ -175,24 +182,31 @@ func (g *Game) Draw(screen *ebiten.Image) {
 					rect := image.Rect(sx, 0, sx+tileSize, tileSize)
 
 					// if the tile is solid, tint it red
-					if tileId > 2 {
+					if g.debug.Enabled && tileId > 2 {
 						op.ColorScale.ScaleWithColor(colornames.Red)
 					}
 
 					// draw tile
 					screen.DrawImage(g.tileSheet.SubImage(rect).(*ebiten.Image), op)
-					ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(%d)", tileId),
-						int(x+tileSize/2), int(y+tileSize/2))
+
+					if g.debug.Enabled {
+						ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(%d)", tileId),
+							int(x+tileSize/2), int(y+tileSize/2))
+					}
 				}
 
 				// draw horizontal grid line
-				vector.StrokeLine(screen, 0, float32(y), float32(screenWidth), float32(y), 2, color.Black, false)
-				ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", r, y), 10, int(y))
+				if g.debug.Enabled {
+					vector.StrokeLine(screen, 0, float32(y), float32(screenWidth), float32(y), 2, color.Black, false)
+					ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", r, y), 10, int(y))
+				}
 			}
 
 			// draw vertical grid line
-			vector.StrokeLine(screen, float32(x), 0, float32(x), float32(screenHeight), 2, color.Black, false)
-			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", c, x), int(x), 10)
+			if g.debug.Enabled {
+				vector.StrokeLine(screen, float32(x), 0, float32(x), float32(screenHeight), 2, color.Black, false)
+				ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", c, x), int(x), 10)
+			}
 		}
 	}
 
@@ -203,19 +217,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	centeredY := g.player.Sprite.ScreenPosition.Y - float64(g.player.Sprite.Dy)/2
 	op.GeoM.Translate(centeredX, centeredY)
 	screen.DrawImage(g.player.Sprite.Image, op)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%.0f", g.player.Left), int(centeredX), int(centeredY))
 
-	ebitenutil.DebugPrintAt(screen,
-		fmt.Sprintf("Player: (%.0f, %.0f) (%.0f, %.0f)",
-			g.player.Sprite.Position.X, g.player.Sprite.Position.Y,
-			g.player.Sprite.ScreenPosition.X, g.player.Sprite.ScreenPosition.Y), 0, 0)
-	ebitenutil.DebugPrintAt(screen,
-		fmt.Sprintf("(L%.0f, R%.0f, T%.0f, B%.0f)", g.player.Left, g.player.Right, g.player.Top, g.player.Bottom), 0, screenHeight-20)
+	if g.debug.Enabled {
+		ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%.0f", g.player.Left), int(centeredX), int(centeredY))
 
-	vector.FillCircle(screen, float32(g.player.Sprite.ScreenPosition.X), float32(g.player.Sprite.ScreenPosition.Y), 2, colornames.Red, false)
+		ebitenutil.DebugPrintAt(screen,
+			fmt.Sprintf("Player: (%.0f, %.0f) (%.0f, %.0f)",
+				g.player.Sprite.Position.X, g.player.Sprite.Position.Y,
+				g.player.Sprite.ScreenPosition.X, g.player.Sprite.ScreenPosition.Y), 0, 0)
+		ebitenutil.DebugPrintAt(screen,
+			fmt.Sprintf("(L%.0f, R%.0f, T%.0f, B%.0f)", g.player.Left, g.player.Right, g.player.Top, g.player.Bottom), 0, screenHeight-20)
 
-	vector.StrokeRect(screen, float32(centeredX), float32(centeredY),
-		float32(g.player.Sprite.Dx), float32(g.player.Sprite.Dy), 2, color.Black, false)
+		vector.FillCircle(screen, float32(g.player.Sprite.ScreenPosition.X), float32(g.player.Sprite.ScreenPosition.Y), 2, colornames.Red, false)
+
+		vector.StrokeRect(screen, float32(centeredX), float32(centeredY),
+			float32(g.player.Sprite.Dx), float32(g.player.Sprite.Dy), 2, color.Black, false)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
