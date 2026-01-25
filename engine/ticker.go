@@ -1,4 +1,4 @@
-package game
+package engine
 
 type Ticker struct {
 	count int

@@ -10,6 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
+	"github.com/wvuong/gogame/engine"
 	"golang.org/x/image/colornames"
 )
 
@@ -27,10 +28,10 @@ const (
 type Game struct {
 	tileSheet   *ebiten.Image
 	spriteSheet *ebiten.Image
-	tileMap     *TileMap
-	camera      *Camera
-	player      *Player
-	debug       *Debug
+	tileMap     *engine.TileMap
+	camera      *engine.Camera
+	player      *engine.Player
+	debug       *engine.Debug
 }
 
 func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
@@ -51,33 +52,33 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 		3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 3, // 13
 	}
 	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
-	tileMap := NewMap([][]int{layer1}, cols, rows, tileSize)
+	tileMap := engine.NewMap([][]int{layer1}, cols, rows, tileSize)
 
-	facingDownSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+	facingDownSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 128, 48, 192),
 		image.Rect(48, 128, 96, 192),
 		image.Rect(96, 128, 144, 192),
 	})
 
-	facingUpSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+	facingUpSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 0, 48, 64),
 		image.Rect(48, 0, 96, 64),
 		image.Rect(96, 0, 144, 64),
 	})
 
-	facingLeftSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+	facingLeftSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 192, 48, 256),
 		image.Rect(48, 192, 96, 256),
 		image.Rect(96, 192, 144, 256),
 	})
 
-	facingRightSpriteIndex := NewSpriteIndex(spriteSheet, []image.Rectangle{
+	facingRightSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 64, 48, 128),
 		image.Rect(48, 64, 96, 128),
 		image.Rect(96, 64, 144, 128),
 	})
 
-	directionalSpriteIndex := &DirectionalSpriteIndex{
+	directionalSpriteIndex := &engine.DirectionalSpriteIndex{
 		Up:    facingUpSpriteIndex,
 		Down:  facingDownSpriteIndex,
 		Left:  facingLeftSpriteIndex,
@@ -85,10 +86,10 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 	}
 
 	// create player at position 100, 100
-	player := NewPlayer(tileMap, directionalSpriteIndex, 100, 100)
+	player := engine.NewPlayer(tileMap, directionalSpriteIndex, 100, 100)
 
 	// create camera and center on player
-	camera := NewCamera(screenWidth, screenHeight, cols, rows, tileSize)
+	camera := engine.NewCamera(screenWidth, screenHeight, cols, rows, tileSize)
 	camera.CenterOn(player.Sprite)
 
 	g := &Game{
@@ -96,7 +97,7 @@ func NewGame(tileSheet *ebiten.Image, spriteSheet *ebiten.Image) *Game {
 		tileMap:   tileMap,
 		camera:    camera,
 		player:    player,
-		debug:     &Debug{Enabled: false},
+		debug:     &engine.Debug{Enabled: false},
 	}
 
 	return g

@@ -1,4 +1,4 @@
-package game
+package engine
 
 type Debug struct {
 	Enabled bool
