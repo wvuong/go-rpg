@@ -13,7 +13,7 @@ type SpriteIndex struct {
 	timer  *Timer
 }
 
-func NewSpriteIndex(image *ebiten.Image, rects []image.Rectangle) *SpriteIndex {
+func NewSpriteIndex(image *ebiten.Image, rects []image.Rectangle, interval time.Duration) *SpriteIndex {
 	slice := make([]*ebiten.Image, len(rects))
 	for i, rect := range rects {
 		// process each rect
@@ -23,7 +23,7 @@ func NewSpriteIndex(image *ebiten.Image, rects []image.Rectangle) *SpriteIndex {
 	return &SpriteIndex{
 		images: slice,
 		idx:    0,
-		timer:  NewTimer(100 * time.Millisecond),
+		timer:  NewTimer(interval),
 	}
 }
 

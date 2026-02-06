@@ -1,4 +1,4 @@
-package images
+package assets
 
 import (
 	"embed"
@@ -16,6 +16,7 @@ var assets embed.FS
 
 var Tiles_png = mustLoadImage("tiles.png")
 var Sprite_png = mustLoadImage("universal-lpc-sprite_male_01_walk-3frame.png")
+var Regular_ttf = mustLoadFont("mplus-1p-regular.ttf")
 
 func mustLoadImage(name string) *ebiten.Image {
 	f, err := assets.Open(name)

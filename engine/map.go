@@ -3,14 +3,23 @@ package engine
 import "math"
 
 type TileMap struct {
-	Layers   [][]int
-	Cols     int
-	Rows     int
-	TileSize int
+	Layers    [][]int
+	Cols      int
+	Rows      int
+	TileSize  int
+	MapWidth  int
+	MapHeight int
 }
 
 func NewMap(layers [][]int, cols int, rows int, tileSize int) *TileMap {
-	return &TileMap{Layers: layers, Cols: cols, Rows: rows, TileSize: tileSize}
+	return &TileMap{
+		Layers:    layers,
+		Cols:      cols,
+		Rows:      rows,
+		TileSize:  tileSize,
+		MapWidth:  cols * tileSize,
+		MapHeight: rows * tileSize,
+	}
 }
 
 func (m *TileMap) GetTile(layer int, col int, row int) int {
