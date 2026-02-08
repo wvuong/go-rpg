@@ -4,11 +4,9 @@ import (
 	"embed"
 	_ "embed"
 	"image"
-	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 //go:embed *
@@ -16,7 +14,8 @@ var assets embed.FS
 
 var Tiles_png = mustLoadImage("tiles.png")
 var Sprite_png = mustLoadImage("universal-lpc-sprite_male_01_walk-3frame.png")
-var Regular_ttf = mustLoadFont("mplus-1p-regular.ttf")
+
+var Regular_ttf = mustLoadFont("mplus-1p-regular.ttf", 16)
 
 func mustLoadImage(name string) *ebiten.Image {
 	f, err := assets.Open(name)
@@ -33,39 +32,19 @@ func mustLoadImage(name string) *ebiten.Image {
 	return ebiten.NewImageFromImage(img)
 }
 
-func mustLoadImages(path string) []*ebiten.Image {
-	matches, err := fs.Glob(assets, path)
+func mustLoadFont(path string, size float64) text.Face {
+	fontFile, err := assets.Open(path)
 	if err != nil {
 		panic(err)
 	}
 
-	images := make([]*ebiten.Image, len(matches))
-	for i, match := range matches {
-		images[i] = mustLoadImage(match)
-	}
-
-	return images
-}
-
-func mustLoadFont(name string) font.Face {
-	f, err := assets.ReadFile(name)
+	s, err := text.NewGoTextFaceSource(fontFile)
 	if err != nil {
 		panic(err)
 	}
 
-	tt, err := opentype.Parse(f)
-	if err != nil {
-		panic(err)
+	return &text.GoTextFace{
+		Source: s,
+		Size:   size,
 	}
-
-	face, err := opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    48,
-		DPI:     72,
-		Hinting: font.HintingVertical,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	return face
 }

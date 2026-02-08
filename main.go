@@ -14,11 +14,13 @@ func main() {
 		ScreenHeight: 512,
 	}
 
-	g := game.NewGame(config)
+	state := engine.GameState{}
+
+	g := game.NewGame(config, &state)
 
 	ebiten.SetWindowSize(config.ScreenWidth, config.ScreenHeight)
 
-	if err := ebiten.RunGame(g); err != nil {
+	if err := ebiten.RunGame(&g); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -24,6 +24,8 @@ const (
 
 type GameScene struct {
 	config      engine.GameConfig
+	state       *engine.GameState
+	director    *Director
 	tileSheet   *ebiten.Image
 	spriteSheet *ebiten.Image
 	tileMap     *engine.TileMap
@@ -32,7 +34,7 @@ type GameScene struct {
 	debug       *engine.Debug
 }
 
-func NewGameScene(config engine.GameConfig) *GameScene {
+func NewGameScene(config engine.GameConfig, state *engine.GameState, director *Director) *GameScene {
 	tileSheet := assets.Tiles_png
 	spriteSheet := assets.Sprite_png
 
@@ -97,6 +99,8 @@ func NewGameScene(config engine.GameConfig) *GameScene {
 
 	g := &GameScene{
 		config:    config,
+		state:     state,
+		director:  director,
 		tileSheet: tileSheet,
 		tileMap:   tileMap,
 		camera:    camera,
@@ -108,6 +112,11 @@ func NewGameScene(config engine.GameConfig) *GameScene {
 }
 
 func (g *GameScene) Update() {
+	// go back to title screen if escape is pressed
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		g.director.SwitchToTitle()
+	}
+
 	// toggle debug mode
 	if inpututil.IsKeyJustPressed(ebiten.KeyTab) {
 		g.debug.Enabled = !g.debug.Enabled

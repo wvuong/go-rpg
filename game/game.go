@@ -6,54 +6,33 @@ import (
 	"github.com/wvuong/gogame/scene"
 )
 
-type Scene interface {
-	Update()
-	Draw(screen *ebiten.Image)
-}
-
-type Director struct {
-	scene Scene
-
-	gameScene scene.GameScene
-}
-
-func NewDirector(config engine.GameConfig) Director {
-	d := Director{
-		gameScene: *scene.NewGameScene(config),
-	}
-
-	return d
-}
-
-func (d *Director) SwitchToGame() {
-	d.scene = &d.gameScene
-}
-
 type Game struct {
-	director     Director
+	state        *engine.GameState
+	director     *scene.Director
 	screenWidth  int
 	screenHeight int
 }
 
-func NewGame(config engine.GameConfig) *Game {
-	g := &Game{
-		director:     NewDirector(config),
+func NewGame(config engine.GameConfig, state *engine.GameState) Game {
+	g := Game{
+		state:        state,
+		director:     scene.NewDirector(config, state),
 		screenWidth:  config.ScreenWidth,
 		screenHeight: config.ScreenHeight,
 	}
 
-	g.director.SwitchToGame()
+	g.director.SwitchToTitle()
 
 	return g
 }
 
 func (g *Game) Update() error {
-	g.director.scene.Update()
+	g.director.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.director.scene.Draw(screen)
+	g.director.Draw(screen)
 }
 
 func (g *Game) Layout(width, height int) (int, int) {
