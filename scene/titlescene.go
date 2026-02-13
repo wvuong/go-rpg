@@ -11,7 +11,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"github.com/wvuong/gogame/assets"
 	"github.com/wvuong/gogame/engine"
 	"golang.org/x/image/colornames"
 	"golang.org/x/image/font/gofont/goregular"
@@ -23,6 +22,8 @@ type TitleScene struct {
 }
 
 func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *Director) *TitleScene {
+	font := DefaultFont()
+
 	center := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(
 			image.NewNineSliceColor(colornames.Darkslategray),
@@ -56,7 +57,7 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 	)
 
 	worldButton := widget.NewButton(
-		widget.ButtonOpts.TextFace(&assets.Regular_ttf),
+		widget.ButtonOpts.TextFace(&font),
 		widget.ButtonOpts.TextColor(&widget.ButtonTextColor{
 			Idle:    colornames.Gainsboro,
 			Hover:   colornames.Gainsboro,
@@ -101,7 +102,7 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 	)
 
 	battleButton := widget.NewButton(
-		widget.ButtonOpts.TextFace(&assets.Regular_ttf),
+		widget.ButtonOpts.TextFace(&font),
 		widget.ButtonOpts.TextColor(&widget.ButtonTextColor{
 			Idle:    colornames.Gainsboro,
 			Hover:   colornames.Gainsboro,

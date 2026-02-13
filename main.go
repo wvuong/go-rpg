@@ -14,7 +14,9 @@ func main() {
 		ScreenHeight: 512,
 	}
 
-	state := engine.GameState{}
+	state := engine.GameState{
+		WorldPosition: *engine.NewVector(100, 100),
+	}
 
 	g := game.NewGame(config, &state)
 

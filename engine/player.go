@@ -19,9 +19,9 @@ type Player struct {
 	Bottom float64
 }
 
-func NewPlayer(tileMap *TileMap, directionalSpriteIndex *DirectionalSpriteIndex, x float64, y float64, speed float64) *Player {
+func NewPlayer(tileMap *TileMap, directionalSpriteIndex *DirectionalSpriteIndex, position *Vector, speed float64) *Player {
 	startingImage := directionalSpriteIndex.Down.NextFrame()
-	sprite := NewSprite(startingImage, x, y)
+	sprite := NewSprite(startingImage, position)
 
 	return &Player{
 		tileMap:                tileMap,

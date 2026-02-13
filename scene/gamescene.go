@@ -91,7 +91,7 @@ func NewGameScene(config engine.GameConfig, state *engine.GameState, director *D
 	}
 
 	// create player at position 100, 100
-	player := engine.NewPlayer(tileMap, directionalSpriteIndex, 100, 100, 2)
+	player := engine.NewPlayer(tileMap, directionalSpriteIndex, &state.WorldPosition, 2)
 
 	// create camera and center on player
 	camera := engine.NewCamera(config.ScreenWidth, config.ScreenHeight, cols, rows, tileSize)

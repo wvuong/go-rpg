@@ -10,10 +10,10 @@ type Sprite struct {
 	Dy             int
 }
 
-func NewSprite(image *ebiten.Image, x, y float64) *Sprite {
+func NewSprite(image *ebiten.Image, position *Vector) *Sprite {
 	return &Sprite{
 		Image:    image,
-		Position: &Vector{X: x, Y: y},
+		Position: position,
 		ScreenPosition: &Vector{
 			X: 0,
 			Y: 0,
