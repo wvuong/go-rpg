@@ -21,11 +21,10 @@ const (
 	tileSize = 64
 )
 
-type GameScene struct {
+type TileMapScene struct {
 	config      engine.GameConfig
 	state       *engine.GameState
 	director    *Director
-	tileSheet   *ebiten.Image
 	spriteSheet *ebiten.Image
 	tileMap     *engine.TileMap
 	camera      *engine.Camera
@@ -33,7 +32,11 @@ type GameScene struct {
 	debug       *engine.Debug
 }
 
-func NewGameScene(config engine.GameConfig, state *engine.GameState, director *Director) *GameScene {
+func NewTileMapScene(
+	config engine.GameConfig,
+	state *engine.GameState,
+	director *Director) *TileMapScene {
+
 	tileSheet := assets.Tiles_png
 	spriteSheet := assets.Sprite_png
 
@@ -99,21 +102,20 @@ func NewGameScene(config engine.GameConfig, state *engine.GameState, director *D
 	camera := engine.NewCamera(config, tileMap, debug)
 	camera.CenterOn(player.Sprite)
 
-	g := &GameScene{
-		config:    config,
-		state:     state,
-		director:  director,
-		tileSheet: tileSheet,
-		tileMap:   tileMap,
-		camera:    camera,
-		player:    player,
-		debug:     debug,
+	g := &TileMapScene{
+		config:   config,
+		state:    state,
+		director: director,
+		tileMap:  tileMap,
+		camera:   camera,
+		player:   player,
+		debug:    debug,
 	}
 
 	return g
 }
 
-func (g *GameScene) Update() {
+func (g *TileMapScene) Update() {
 	// go back to title screen if escape is pressed
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		g.director.SwitchToTitle()
@@ -131,7 +133,7 @@ func (g *GameScene) Update() {
 	g.camera.Update()
 }
 
-func (g *GameScene) Draw(screen *ebiten.Image) {
+func (g *TileMapScene) Draw(screen *ebiten.Image) {
 	// draw the tilemap with the camera's viewport
 	g.camera.Draw(screen)
 

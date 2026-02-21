@@ -80,7 +80,7 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 		),
 		widget.ButtonOpts.ClickedHandler(
 			func(args *widget.ButtonClickedEventArgs) {
-				director.SwitchToGame()
+				director.SwitchToTileMap()
 			},
 		),
 	)

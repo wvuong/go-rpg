@@ -35,6 +35,6 @@ func (d *Director) SwitchToTitle() {
 	d.scene = NewTitleScene(d.config, d.state, d)
 }
 
-func (d *Director) SwitchToGame() {
-	d.scene = NewGameScene(d.config, d.state, d)
+func (d *Director) SwitchToTileMap() {
+	d.scene = NewTileMapScene(d.config, d.state, d)
 }
