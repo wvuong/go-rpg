@@ -1,6 +1,10 @@
 package engine
 
-import "math"
+import (
+	"math"
+
+	"github.com/hajimehoshi/ebiten/v2"
+)
 
 type TileMap struct {
 	Layers    [][]int
@@ -9,9 +13,10 @@ type TileMap struct {
 	TileSize  int
 	MapWidth  int
 	MapHeight int
+	TileSheet *ebiten.Image
 }
 
-func NewMap(layers [][]int, cols int, rows int, tileSize int) *TileMap {
+func NewMap(tileSheet *ebiten.Image, layers [][]int, cols int, rows int, tileSize int) *TileMap {
 	return &TileMap{
 		Layers:    layers,
 		Cols:      cols,
@@ -19,6 +24,7 @@ func NewMap(layers [][]int, cols int, rows int, tileSize int) *TileMap {
 		TileSize:  tileSize,
 		MapWidth:  cols * tileSize,
 		MapHeight: rows * tileSize,
+		TileSheet: tileSheet,
 	}
 }
 

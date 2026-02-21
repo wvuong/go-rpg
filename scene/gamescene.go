@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"math"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -55,7 +54,7 @@ func NewGameScene(config engine.GameConfig, state *engine.GameState, director *D
 		3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 3, // 13
 	}
 	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
-	tileMap := engine.NewMap([][]int{layer1}, cols, rows, tileSize)
+	tileMap := engine.NewMap(tileSheet, [][]int{layer1}, cols, rows, tileSize)
 
 	// create sprite indexes for each direction
 	frameInterval := 100 * time.Millisecond
@@ -90,11 +89,14 @@ func NewGameScene(config engine.GameConfig, state *engine.GameState, director *D
 		Right: facingRightSpriteIndex,
 	}
 
+	// debug state storage
+	debug := &engine.Debug{Enabled: false}
+
 	// create player at position 100, 100
 	player := engine.NewPlayer(tileMap, directionalSpriteIndex, &state.WorldPosition, 2)
 
 	// create camera and center on player
-	camera := engine.NewCamera(config.ScreenWidth, config.ScreenHeight, cols, rows, tileSize)
+	camera := engine.NewCamera(config, tileMap, debug)
 	camera.CenterOn(player.Sprite)
 
 	g := &GameScene{
@@ -105,7 +107,7 @@ func NewGameScene(config engine.GameConfig, state *engine.GameState, director *D
 		tileMap:   tileMap,
 		camera:    camera,
 		player:    player,
-		debug:     &engine.Debug{Enabled: false},
+		debug:     debug,
 	}
 
 	return g
@@ -130,65 +132,8 @@ func (g *GameScene) Update() {
 }
 
 func (g *GameScene) Draw(screen *ebiten.Image) {
-	// use camera position to determine visible tiles
-	startCol := int(math.Floor(float64(g.camera.Position.X / tileSize)))
-	endCol := startCol + int(math.Floor(float64(g.camera.Width/tileSize)))
-	startRow := int(math.Floor(g.camera.Position.Y / tileSize))
-	endRow := startRow + int(g.camera.Height/tileSize)
-	offsetX := -g.camera.Position.X + float64(startCol*tileSize)
-	offsetY := -g.camera.Position.Y + float64(startRow*tileSize)
-
-	// draw layers
-	for l := range g.tileMap.Layers {
-		for c := startCol; c <= endCol; c++ {
-			// x is the screen position of the tile
-			x := float64((c-startCol)*tileSize) + offsetX
-
-			for r := startRow; r <= endRow; r++ {
-				// y is the screen position of the tile
-				y := float64((r-startRow)*tileSize) + offsetY
-
-				// this is the raw tile index from the map data
-				tileId := g.tileMap.GetTile(l, c, r)
-				// 0 => empty tile
-				if tileId != 0 {
-					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(x, y)
-
-					tileIdx := tileId - 1 // subtract 1 to get the tile array index
-
-					// create a rect of the tile in the tilesheet
-					sx := tileIdx * tileSize
-					rect := image.Rect(sx, 0, sx+tileSize, tileSize)
-
-					// if the tile is solid, tint it red
-					if g.debug.Enabled && tileId > 2 {
-						op.ColorScale.ScaleWithColor(colornames.Red)
-					}
-
-					// draw tile
-					screen.DrawImage(g.tileSheet.SubImage(rect).(*ebiten.Image), op)
-
-					if g.debug.Enabled {
-						ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(%d)", tileId),
-							int(x+tileSize/2), int(y+tileSize/2))
-					}
-				}
-
-				// draw horizontal grid line
-				if g.debug.Enabled {
-					vector.StrokeLine(screen, 0, float32(y), float32(g.config.ScreenWidth), float32(y), 2, color.Black, false)
-					ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", r, y), 10, int(y))
-				}
-			}
-
-			// draw vertical grid line
-			if g.debug.Enabled {
-				vector.StrokeLine(screen, float32(x), 0, float32(x), float32(g.config.ScreenHeight), 2, color.Black, false)
-				ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", c, x), int(x), 10)
-			}
-		}
-	}
+	// draw the tilemap with the camera's viewport
+	g.camera.Draw(screen)
 
 	// draw player 48x64 sprite
 	// center sprite on its position
