@@ -15,12 +15,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-const (
-	cols     = 12
-	rows     = 14
-	tileSize = 64
-)
-
 type TileMapScene struct {
 	config      engine.GameConfig
 	state       *engine.GameState
@@ -35,29 +29,10 @@ type TileMapScene struct {
 func NewTileMapScene(
 	config engine.GameConfig,
 	state *engine.GameState,
-	director *Director) *TileMapScene {
+	director *Director,
+	tileMap *engine.TileMap) *TileMapScene {
 
-	tileSheet := assets.Tiles_png
 	spriteSheet := assets.Sprite_png
-
-	layer1 := []int{
-		3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 0
-		3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, // 1
-		3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, // 2
-		3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, // 3
-		3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 3, // 4
-		3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, // 5
-		3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, // 6
-		3, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 3, // 7
-		3, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 3, // 8
-		3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, // 9
-		3, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 3, // 10
-		3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, // 11
-		3, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 3, // 12
-		3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 3, // 13
-	}
-	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
-	tileMap := engine.NewMap(tileSheet, [][]int{layer1}, cols, rows, tileSize)
 
 	// create sprite indexes for each direction
 	frameInterval := 100 * time.Millisecond
