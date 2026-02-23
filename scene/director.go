@@ -6,21 +6,15 @@ import (
 	"github.com/wvuong/gogame/engine"
 )
 
-const (
-	cols     = 12
-	rows     = 14
-	tileSize = 64
-)
-
 type Scene interface {
 	Update()
 	Draw(screen *ebiten.Image)
 }
 
 type Director struct {
-	config  engine.GameConfig
-	state   *engine.GameState
-	tileMap *engine.TileMap
+	config   engine.GameConfig
+	state    *engine.GameState
+	tileMaps map[string]*engine.TileMap
 
 	scene Scene
 }
@@ -44,9 +38,14 @@ func NewDirector(config engine.GameConfig, state *engine.GameState) *Director {
 		3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 3, // 13
 	}
 	//  0. 1. 2. 3. 4. 5. 6. 7. 8. 9. 10 11
-	tileMap := engine.NewMap(assets.Tiles_png, [][]int{layer1}, cols, rows, tileSize)
 
-	return &Director{config: config, state: state, tileMap: tileMap}
+	layers := [][]int{layer1}
+	tileSheets := []*ebiten.Image{assets.Tiles_png}
+	tileMap := engine.NewMap(tileSheets, layers, 12, 14, 64)
+
+	tileMaps := make(map[string]*engine.TileMap)
+	tileMaps["default"] = tileMap
+	return &Director{config: config, state: state, tileMaps: tileMaps}
 }
 
 func (d *Director) Update() error {
@@ -63,5 +62,5 @@ func (d *Director) SwitchToTitle() {
 }
 
 func (d *Director) SwitchToTileMap() {
-	d.scene = NewTileMapScene(d.config, d.state, d, d.tileMap)
+	d.scene = NewTileMapScene(d.config, d.state, d, d.tileMaps["default"])
 }

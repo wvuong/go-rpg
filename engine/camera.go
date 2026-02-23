@@ -2,14 +2,12 @@ package engine
 
 import (
 	"fmt"
-	"image"
 	"image/color"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
-	"golang.org/x/image/colornames"
 )
 
 type Camera struct {
@@ -105,41 +103,17 @@ func (c *Camera) Draw(screen *ebiten.Image) {
 			// x is the screen position of the tile
 			x := float64((col-startCol)*tileSize) + offsetX
 
-			for r := startRow; r <= endRow; r++ {
+			for row := startRow; row <= endRow; row++ {
 				// y is the screen position of the tile
-				y := float64((r-startRow)*tileSize) + offsetY
+				y := float64((row-startRow)*tileSize) + offsetY
 
-				// this is the raw tile index from the map data
-				tileId := c.tileMap.GetTile(layer, col, r)
-				// 0 => empty tile
-				if tileId != 0 {
-					op := &ebiten.DrawImageOptions{}
-					op.GeoM.Translate(x, y)
-
-					tileIdx := tileId - 1 // subtract 1 to get the tile array index
-
-					// create a rect of the tile in the tilesheet
-					sx := tileIdx * tileSize
-					rect := image.Rect(sx, 0, sx+tileSize, tileSize)
-
-					// if the tile is solid, tint it red
-					if c.debug.Enabled && tileId > 2 {
-						op.ColorScale.ScaleWithColor(colornames.Red)
-					}
-
-					// draw tile
-					screen.DrawImage(c.tileMap.TileSheet.SubImage(rect).(*ebiten.Image), op)
-
-					if c.debug.Enabled {
-						ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(%d)", tileId),
-							int(x+tileSizeFloat/2), int(y+tileSizeFloat/2))
-					}
-				}
+				// draw tile to screen
+				c.tileMap.DrawTile(screen, layer, col, row, x, y, c.debug)
 
 				// draw horizontal grid line
 				if c.debug.Enabled {
 					vector.StrokeLine(screen, 0, float32(y), float32(c.config.ScreenWidth), float32(y), 2, color.Black, false)
-					ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", r, y), 10, int(y))
+					ebitenutil.DebugPrintAt(screen, fmt.Sprintf("%d %.0f", row, y), 10, int(y))
 				}
 			}
 

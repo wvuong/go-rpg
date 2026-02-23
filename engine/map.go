@@ -1,30 +1,35 @@
 package engine
 
 import (
+	"fmt"
+	"image"
 	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"golang.org/x/image/colornames"
 )
 
 type TileMap struct {
-	Layers    [][]int
-	Cols      int
-	Rows      int
-	TileSize  int
-	MapWidth  int
-	MapHeight int
-	TileSheet *ebiten.Image
+	Layers     [][]int
+	Cols       int
+	Rows       int
+	TileSize   int
+	MapWidth   int
+	MapHeight  int
+	TileSheets []*ebiten.Image
 }
 
-func NewMap(tileSheet *ebiten.Image, layers [][]int, cols int, rows int, tileSize int) *TileMap {
+func NewMap(tileSheets []*ebiten.Image, layers [][]int, cols int, rows int, tileSize int) *TileMap {
+
 	return &TileMap{
-		Layers:    layers,
-		Cols:      cols,
-		Rows:      rows,
-		TileSize:  tileSize,
-		MapWidth:  cols * tileSize,
-		MapHeight: rows * tileSize,
-		TileSheet: tileSheet,
+		Layers:     layers,
+		Cols:       cols,
+		Rows:       rows,
+		TileSize:   tileSize,
+		MapWidth:   cols * tileSize,
+		MapHeight:  rows * tileSize,
+		TileSheets: tileSheets,
 	}
 }
 
@@ -62,4 +67,35 @@ func (m *TileMap) getX(col int) float64 {
 
 func (m *TileMap) getY(row int) float64 {
 	return float64(row * m.TileSize)
+}
+
+func (m *TileMap) DrawTile(screen *ebiten.Image, layer int, col int, row int, x float64, y float64, debug *Debug) {
+	// this is the raw tile index from the map data
+	tileId := m.GetTile(layer, col, row)
+
+	// 0 => empty tile
+	if tileId != 0 {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(x, y)
+
+		tileIdx := tileId - 1 // subtract 1 to get the tile array index
+
+		// create a rect of the tile in the tilesheet
+		sx := tileIdx * m.TileSize
+		rect := image.Rect(sx, 0, sx+m.TileSize, m.TileSize)
+
+		// if the tile is solid, tint it red
+		if debug.Enabled && tileId > 2 {
+			op.ColorScale.ScaleWithColor(colornames.Red)
+		}
+
+		// draw the tile to the screen
+		// ebiten will automatically clip the tile if it's partially off-screen
+		screen.DrawImage(m.TileSheets[layer].SubImage(rect).(*ebiten.Image), op)
+
+		if debug.Enabled {
+			ebitenutil.DebugPrintAt(screen, fmt.Sprintf("(%d)", tileId),
+				int(x+float64(m.TileSize)/2), int(y+float64(m.TileSize)/2))
+		}
+	}
 }
