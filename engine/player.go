@@ -96,8 +96,8 @@ func (p *Player) Update() {
 	}
 
 	// clamp player position to map bounds
-	x := math.Max(0, math.Min(p.Sprite.Position.X, float64(p.tileMap.MapWidth)))
-	y := math.Max(0, math.Min(p.Sprite.Position.Y, float64(p.tileMap.MapHeight)))
+	x := math.Max(0, math.Min(p.Sprite.Position.X, float64(p.tileMap.mapWidth)))
+	y := math.Max(0, math.Min(p.Sprite.Position.Y, float64(p.tileMap.mapHeight)))
 	p.Sprite.Position.X = x
 	p.Sprite.Position.Y = y
 

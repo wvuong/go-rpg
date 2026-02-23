@@ -29,7 +29,7 @@ func NewCamera(
 		tileMap:     tileMap,
 		debug:       debug,
 		position:    Vector{X: 0, Y: 0},
-		maxPosition: Vector{X: float64(tileMap.Cols*tileMap.TileSize - config.ScreenWidth), Y: float64(tileMap.Rows*tileMap.TileSize - config.ScreenHeight)},
+		maxPosition: Vector{X: float64(tileMap.cols*tileMap.tileSize - config.ScreenWidth), Y: float64(tileMap.rows*tileMap.tileSize - config.ScreenHeight)},
 	}
 }
 
@@ -84,8 +84,8 @@ func (c *Camera) Update() {
 }
 
 func (c *Camera) Draw(screen *ebiten.Image) {
-	tileSize := c.tileMap.TileSize
-	tileSizeFloat := float64(c.tileMap.TileSize)
+	tileSize := c.tileMap.tileSize
+	tileSizeFloat := float64(c.tileMap.tileSize)
 	width := c.config.ScreenWidth
 	height := c.config.ScreenHeight
 
@@ -98,7 +98,7 @@ func (c *Camera) Draw(screen *ebiten.Image) {
 	offsetY := -c.position.Y + float64(startRow*tileSize)
 
 	// draw layers
-	for layer := range c.tileMap.Layers {
+	for layer := range c.tileMap.layers {
 		for col := startCol; col <= endCol; col++ {
 			// x is the screen position of the tile
 			x := float64((col-startCol)*tileSize) + offsetX
@@ -108,7 +108,7 @@ func (c *Camera) Draw(screen *ebiten.Image) {
 				y := float64((row-startRow)*tileSize) + offsetY
 
 				// draw tile to screen
-				c.tileMap.DrawTile(screen, layer, col, row, x, y, c.debug)
+				c.tileMap.drawTile(screen, layer, col, row, x, y, c.debug)
 
 				// draw horizontal grid line
 				if c.debug.Enabled {

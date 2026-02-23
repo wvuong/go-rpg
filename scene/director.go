@@ -41,7 +41,7 @@ func NewDirector(config engine.GameConfig, state *engine.GameState) *Director {
 
 	layers := [][]int{layer1}
 	tileSheets := []*ebiten.Image{assets.Tiles_png}
-	tileMap := engine.NewMap(tileSheets, layers, 12, 14, 64)
+	tileMap := engine.NewTileMap(tileSheets, layers, 12, 14, 64)
 
 	tileMaps := make(map[string]*engine.TileMap)
 	tileMaps["default"] = tileMap
