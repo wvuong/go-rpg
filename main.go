@@ -4,11 +4,14 @@ import (
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/wvuong/gogame/assets"
 	"github.com/wvuong/gogame/engine"
 	"github.com/wvuong/gogame/game"
 )
 
 func main() {
+	assets.MustLoadAssets()
+
 	config := engine.GameConfig{
 		ScreenWidth:  512,
 		ScreenHeight: 512,

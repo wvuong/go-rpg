@@ -8,6 +8,7 @@ type Sprite struct {
 	ScreenPosition *Vector
 	Dx             int
 	Dy             int
+	Layer          int
 }
 
 func NewSprite(image *ebiten.Image, position *Vector) *Sprite {
@@ -18,7 +19,8 @@ func NewSprite(image *ebiten.Image, position *Vector) *Sprite {
 			X: 0,
 			Y: 0,
 		},
-		Dx: image.Bounds().Dx(),
-		Dy: image.Bounds().Dy(),
+		Dx:    image.Bounds().Dx(),
+		Dy:    image.Bounds().Dy(),
+		Layer: 0,
 	}
 }
