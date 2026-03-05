@@ -19,14 +19,12 @@ var (
 	//go:embed *
 	assetsFS embed.FS
 
-	Tiles_png  *ebiten.Image
 	Sprite_png *ebiten.Image
 
 	TileMaps map[string]*engine.TileMap
 )
 
 func MustLoadAssets() {
-	Tiles_png = mustLoadImage("tiles.png")
 	Sprite_png = mustLoadImage("universal-lpc-sprite_male_01_walk-3frame.png")
 
 	levelLoader := newTileMapLoader()
