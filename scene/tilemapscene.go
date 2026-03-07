@@ -75,7 +75,7 @@ func NewTileMapScene(
 
 	// create camera and center on player
 	camera := engine.NewCamera(config, tileMap, debug)
-	camera.CenterOn(player.Sprite)
+	camera.CenterOn(player)
 
 	g := &TileMapScene{
 		config:   config,
@@ -125,7 +125,7 @@ func (g *TileMapScene) Draw(screen *ebiten.Image) {
 
 		ebitenutil.DebugPrintAt(screen,
 			fmt.Sprintf("Player: (%.0f, %.0f) (%.0f, %.0f)",
-				g.player.Sprite.Position.X, g.player.Sprite.Position.Y,
+				g.player.Position.X, g.player.Position.Y,
 				g.player.Sprite.ScreenPosition.X, g.player.Sprite.ScreenPosition.Y), 0, 0)
 		ebitenutil.DebugPrintAt(screen,
 			fmt.Sprintf("(L%.0f, R%.0f, T%.0f, B%.0f)", g.player.Left, g.player.Right, g.player.Top, g.player.Bottom), 0, g.config.ScreenHeight-20)

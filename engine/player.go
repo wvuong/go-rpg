@@ -7,8 +7,9 @@ import (
 )
 
 type Player struct {
-	tileMap *TileMap
-	Sprite  *Sprite
+	tileMap  *TileMap
+	Sprite   *Sprite
+	Position *Vector
 
 	directionalSpriteIndex *DirectionalSpriteIndex
 	speed                  float64
@@ -21,11 +22,12 @@ type Player struct {
 
 func NewPlayer(tileMap *TileMap, directionalSpriteIndex *DirectionalSpriteIndex, position *Vector, speed float64) *Player {
 	startingImage := directionalSpriteIndex.Down.NextFrame()
-	sprite := NewSprite(startingImage, position)
+	sprite := NewSprite(startingImage)
 
 	return &Player{
 		tileMap:                tileMap,
 		Sprite:                 sprite,
+		Position:               position,
 		directionalSpriteIndex: directionalSpriteIndex,
 		speed:                  speed,
 	}
@@ -48,15 +50,15 @@ func (p *Player) Update() {
 	}
 
 	// update player position
-	p.Sprite.Position.X += dirX
-	p.Sprite.Position.Y += dirY
+	p.Position.X += dirX
+	p.Position.Y += dirY
 
 	// check for collisions at new player position
 	// calculate the player's bounding box
-	left := p.Sprite.Position.X - float64(p.Sprite.Dx)/2
-	right := p.Sprite.Position.X + float64(p.Sprite.Dx)/2 - 1
-	top := p.Sprite.Position.Y - float64(p.Sprite.Dy)/2
-	bottom := p.Sprite.Position.Y + float64(p.Sprite.Dy)/2 - 1
+	left := p.Position.X - float64(p.Sprite.Dx)/2
+	right := p.Position.X + float64(p.Sprite.Dx)/2 - 1
+	top := p.Position.Y - float64(p.Sprite.Dy)/2
+	bottom := p.Position.Y + float64(p.Sprite.Dy)/2 - 1
 
 	// store the bounding box values
 	p.Left = left
@@ -76,30 +78,30 @@ func (p *Player) Update() {
 			// moving down
 			row := p.tileMap.getRow(bottom)
 			// align player to top edge of tile
-			p.Sprite.Position.Y = -float64(p.Sprite.Dy)/2 + p.tileMap.getY(row)
+			p.Position.Y = -float64(p.Sprite.Dy)/2 + p.tileMap.getY(row)
 		} else if dirY < 0 {
 			// moving up
 			row := p.tileMap.getRow(top)
 			// align player to bottom edge of tile
-			p.Sprite.Position.Y = float64(p.Sprite.Dy)/2 + p.tileMap.getY(row+1)
+			p.Position.Y = float64(p.Sprite.Dy)/2 + p.tileMap.getY(row+1)
 		} else if dirX > 0 {
 			// moving right
 			col := p.tileMap.getCol(right)
 			// align player to left edge of tile
-			p.Sprite.Position.X = -float64(p.Sprite.Dx)/2 + p.tileMap.getX(col)
+			p.Position.X = -float64(p.Sprite.Dx)/2 + p.tileMap.getX(col)
 		} else if dirX < 0 {
 			// moving left
 			col := p.tileMap.getCol(left)
 			// align player to right edge of tile
-			p.Sprite.Position.X = float64(p.Sprite.Dx)/2 + p.tileMap.getX(col+1)
+			p.Position.X = float64(p.Sprite.Dx)/2 + p.tileMap.getX(col+1)
 		}
 	}
 
 	// clamp player position to map bounds
-	x := math.Max(0, math.Min(p.Sprite.Position.X, float64(p.tileMap.mapWidth)))
-	y := math.Max(0, math.Min(p.Sprite.Position.Y, float64(p.tileMap.mapHeight)))
-	p.Sprite.Position.X = x
-	p.Sprite.Position.Y = y
+	x := math.Max(0, math.Min(p.Position.X, float64(p.tileMap.mapWidth)))
+	y := math.Max(0, math.Min(p.Position.Y, float64(p.tileMap.mapHeight)))
+	p.Position.X = x
+	p.Position.Y = y
 
 	// update animation based on movement direction
 	if dirY < 0 {

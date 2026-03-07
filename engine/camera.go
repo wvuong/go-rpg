@@ -16,7 +16,7 @@ type Camera struct {
 	debug       *Debug
 	position    Vector
 	maxPosition Vector
-	target      *Sprite
+	target      *Player
 }
 
 func NewCamera(
@@ -42,10 +42,10 @@ func (c *Camera) Move(dirx, diry float64) {
 	c.position.Y = math.Max(0, math.Min(c.position.Y, c.maxPosition.Y))
 }
 
-func (c *Camera) CenterOn(sprite *Sprite) {
-	c.target = sprite
-	sprite.ScreenPosition.X = 0
-	sprite.ScreenPosition.Y = 0
+func (c *Camera) CenterOn(player *Player) {
+	c.target = player
+	player.Sprite.ScreenPosition.X = 0
+	player.Sprite.ScreenPosition.Y = 0
 }
 
 func (c *Camera) Update() {
@@ -55,8 +55,8 @@ func (c *Camera) Update() {
 
 		// assume followed sprite should be placed at the center of the screen
 		// whenever possible
-		c.target.ScreenPosition.X = width / 2
-		c.target.ScreenPosition.Y = height / 2
+		c.target.Sprite.ScreenPosition.X = width / 2
+		c.target.Sprite.ScreenPosition.Y = height / 2
 
 		// make the camera follow the sprite
 		c.position.X = c.target.Position.X - width/2
@@ -72,12 +72,12 @@ func (c *Camera) Update() {
 		// left and right sides
 		if c.target.Position.X < width/2 ||
 			c.target.Position.X > c.maxPosition.X+width/2 {
-			c.target.ScreenPosition.X = c.target.Position.X - c.position.X
+			c.target.Sprite.ScreenPosition.X = c.target.Position.X - c.position.X
 		}
 		// top and bottom sides
 		if c.target.Position.Y < height/2 ||
 			c.target.Position.Y > c.maxPosition.Y+height/2 {
-			c.target.ScreenPosition.Y = c.target.Position.Y - c.position.Y
+			c.target.Sprite.ScreenPosition.Y = c.target.Position.Y - c.position.Y
 		}
 	}
 
