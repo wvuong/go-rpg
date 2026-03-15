@@ -13,8 +13,8 @@ func main() {
 	assets.MustLoadAssets()
 
 	config := engine.GameConfig{
-		ScreenWidth:  512,
-		ScreenHeight: 512,
+		ScreenWidth:  1024,
+		ScreenHeight: 768,
 	}
 
 	state := engine.GameState{
