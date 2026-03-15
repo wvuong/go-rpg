@@ -42,7 +42,7 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 		)),
 	)
 
-	a := widget.NewContainer(
+	worldRow := widget.NewContainer(
 		widget.ContainerOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Stretch: true,
@@ -85,9 +85,9 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 		),
 	)
 
-	a.AddChild(worldButton)
+	worldRow.AddChild(worldButton)
 
-	b := widget.NewContainer(
+	battleRow := widget.NewContainer(
 		widget.ContainerOpts.WidgetOpts(
 			widget.WidgetOpts.LayoutData(widget.RowLayoutData{
 				Stretch: true,
@@ -123,12 +123,17 @@ func NewTitleScene(config engine.GameConfig, state *engine.GameState, director *
 			}),
 			widget.WidgetOpts.MinSize(180, 48),
 		),
+		widget.ButtonOpts.ClickedHandler(
+			func(args *widget.ButtonClickedEventArgs) {
+				director.SwitchToBattle()
+			},
+		),
 	)
 
-	b.AddChild(battleButton)
+	battleRow.AddChild(battleButton)
 
-	center.AddChild(a)
-	center.AddChild(b)
+	center.AddChild(worldRow)
+	center.AddChild(battleRow)
 
 	root := widget.NewContainer(
 		widget.ContainerOpts.BackgroundImage(

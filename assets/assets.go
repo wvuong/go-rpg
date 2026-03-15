@@ -21,11 +21,41 @@ var (
 
 	Sprite_png *ebiten.Image
 
+	BlackWarrior_Idle   *ebiten.Image
+	BlackWarrior_Run    *ebiten.Image
+	BlackWarrior_Attack *ebiten.Image
+	BlackWarrior_Guard  *ebiten.Image
+
+	BlueWarrior_Idle   *ebiten.Image
+	BlueWarrior_Run    *ebiten.Image
+	BlueWarrior_Attack *ebiten.Image
+	BlueWarrior_Guard  *ebiten.Image
+
+	BlackArcher_Idle   *ebiten.Image
+	BlackArcher_Run    *ebiten.Image
+	BlackArcher_Attack *ebiten.Image
+	Arrow              *ebiten.Image
+
 	TileMaps map[string]*engine.TileMap
 )
 
 func MustLoadAssets() {
 	Sprite_png = mustLoadImage("universal-lpc-sprite_male_01_walk-3frame.png")
+
+	BlackWarrior_Idle = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Warrior/Warrior_Idle.png")
+	BlackWarrior_Run = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Warrior/Warrior_Run.png")
+	BlackWarrior_Attack = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Warrior/Warrior_Attack1.png")
+	BlackWarrior_Guard = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Warrior/Warrior_Guard.png")
+
+	BlueWarrior_Idle = mustLoadImage("Tiny Swords (Free Pack)/Units/Blue Units/Warrior/Warrior_Idle.png")
+	BlueWarrior_Run = mustLoadImage("Tiny Swords (Free Pack)/Units/Blue Units/Warrior/Warrior_Run.png")
+	BlueWarrior_Attack = mustLoadImage("Tiny Swords (Free Pack)/Units/Blue Units/Warrior/Warrior_Attack1.png")
+	BlueWarrior_Guard = mustLoadImage("Tiny Swords (Free Pack)/Units/Blue Units/Warrior/Warrior_Guard.png")
+
+	BlackArcher_Idle = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Archer_Idle.png")
+	BlackArcher_Run = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Archer_Run.png")
+	BlackArcher_Attack = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Archer_Shoot.png")
+	Arrow = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Arrow.png")
 
 	levelLoader := newTileMapLoader()
 	TileMaps = levelLoader.MustLoadTileMaps()

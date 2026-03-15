@@ -36,29 +36,34 @@ func NewTileMapScene(
 
 	// create sprite indexes for each direction
 	frameInterval := 100 * time.Millisecond
+	frameIntervals := make([]time.Duration, 3)
+	frameIntervals[0] = frameInterval
+	frameIntervals[1] = frameInterval
+	frameIntervals[2] = frameInterval
+
 	facingDownSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 128, 48, 192),
 		image.Rect(48, 128, 96, 192),
 		image.Rect(96, 128, 144, 192),
-	}, frameInterval)
+	}, true, frameIntervals)
 
 	facingUpSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 0, 48, 64),
 		image.Rect(48, 0, 96, 64),
 		image.Rect(96, 0, 144, 64),
-	}, frameInterval)
+	}, true, frameIntervals)
 
 	facingLeftSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 192, 48, 256),
 		image.Rect(48, 192, 96, 256),
 		image.Rect(96, 192, 144, 256),
-	}, frameInterval)
+	}, true, frameIntervals)
 
 	facingRightSpriteIndex := engine.NewSpriteIndex(spriteSheet, []image.Rectangle{
 		image.Rect(0, 64, 48, 128),
 		image.Rect(48, 64, 96, 128),
 		image.Rect(96, 64, 144, 128),
-	}, frameInterval)
+	}, true, frameIntervals)
 
 	directionalSpriteIndex := &engine.DirectionalSpriteIndex{
 		Up:    facingUpSpriteIndex,

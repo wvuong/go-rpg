@@ -39,3 +39,7 @@ func (d *Director) SwitchToTitle() {
 func (d *Director) SwitchToTileMap() {
 	d.scene = NewTileMapScene(d.config, d.state, d, d.tileMaps["levels/world.tmx"])
 }
+
+func (d *Director) SwitchToBattle() {
+	d.scene = NewBattleScene(d.config, d.state, d)
+}
