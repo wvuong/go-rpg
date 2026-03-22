@@ -36,6 +36,11 @@ var (
 	BlackArcher_Attack *ebiten.Image
 	Arrow              *ebiten.Image
 
+	BlackLancer_Idle   *ebiten.Image
+	BlackLancer_Run    *ebiten.Image
+	BlackLancer_Attack *ebiten.Image
+	BlackLancer_Guard  *ebiten.Image
+
 	TileMaps map[string]*engine.TileMap
 )
 
@@ -56,6 +61,11 @@ func MustLoadAssets() {
 	BlackArcher_Run = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Archer_Run.png")
 	BlackArcher_Attack = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Archer_Shoot.png")
 	Arrow = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Archer/Arrow.png")
+
+	BlackLancer_Idle = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Lancer/Lancer_Idle.png")
+	BlackLancer_Run = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Lancer/Lancer_Run.png")
+	BlackLancer_Attack = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Lancer/Lancer_Right_Attack.png")
+	BlackLancer_Guard = mustLoadImage("Tiny Swords (Free Pack)/Units/Black Units/Lancer/Lancer_Right_Defence.png")
 
 	levelLoader := newTileMapLoader()
 	TileMaps = levelLoader.MustLoadTileMaps()

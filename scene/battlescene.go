@@ -64,6 +64,19 @@ func NewBattleScene(config engine.GameConfig, state *engine.GameState, director 
 		AttackOne: blackArcherAttackSpriteIndex,
 	}
 
+	blackLancerIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Idle, 320, 320, 12, true, frameIntervals(100*time.Millisecond, 12))
+	blackLancerRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Run, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6))
+	blackLancerAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Attack, 320, 320, 3, true, frameIntervals(100*time.Millisecond, 3))
+	blackLancerGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Guard, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6))
+	blackLancerSprite := engine.NewSprite2(blackLancerIdleSpriteIndex.NextFrame(), false, 0)
+
+	blackLancerAnimations := &engine.BattleAnimations{
+		Idle:      blackLancerIdleSpriteIndex,
+		Run:       blackLancerRunSpriteIndex,
+		AttackOne: blackLancerAttackSpriteIndex,
+		Guard:     blackLancerGuardSpriteIndex,
+	}
+
 	root := buildUI(config)
 
 	return &BattleScene{
@@ -74,6 +87,7 @@ func NewBattleScene(config engine.GameConfig, state *engine.GameState, director 
 			engine.NewBattler(blackWarriorSprite, blackWarriorAnimations, engine.NewVector(100, 100)),
 			engine.NewBattler(blueWarriorSprite, blueWarriorAnimations, engine.NewVector(400, 100)),
 			engine.NewBattler(blackArcherSprite, blackArcherAnimations, engine.NewVector(100, 200)),
+			engine.NewBattler(blackLancerSprite, blackLancerAnimations, engine.NewVector(100, 300)),
 		},
 		arrows: make([]*engine.Sprite, 0),
 	}
@@ -125,6 +139,9 @@ func (bs *BattleScene) ChangeState(state engine.BattlerState) {
 
 	right := bs.battlers[1]
 	right.SetState(state)
+
+	left3 := bs.battlers[3]
+	left3.SetState(state)
 }
 
 func (bs *BattleScene) Attack() {
