@@ -72,7 +72,11 @@ func MustLoadAssets() {
 }
 
 func mustLoadImage(name string) *ebiten.Image {
-	f, err := assetsFS.Open(name)
+	return MustLoadImage(assetsFS, name)
+}
+
+func MustLoadImage(filesystem fs.FS, name string) *ebiten.Image {
+	f, err := filesystem.Open(name)
 	if err != nil {
 		panic(err)
 	}
@@ -84,6 +88,10 @@ func mustLoadImage(name string) *ebiten.Image {
 	}
 
 	return ebiten.NewImageFromImage(img)
+}
+
+func MustLoadJson(filesystem fs.FS, name string) ([]byte, error) {
+	return fs.ReadFile(filesystem, name)
 }
 
 type tileMapLoader struct {

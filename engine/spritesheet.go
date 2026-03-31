@@ -8,13 +8,16 @@ import (
 )
 
 type SpriteIndex struct {
-	images    []*ebiten.Image
-	frames    int
-	intervals []time.Duration
-	idx       int
-	timer     *Timer
-	loop      bool
-	duration  time.Duration
+	images         []*ebiten.Image
+	frames         int
+	intervals      []time.Duration
+	idx            int
+	timer          *Timer
+	loop           bool
+	duration       time.Duration
+	width          int
+	height         int
+	skipFirstFrame bool
 }
 
 func NewSpriteIndex(spriteSheet *ebiten.Image, rects []image.Rectangle, loop bool, intervals []time.Duration) *SpriteIndex {
@@ -29,6 +32,9 @@ func NewSpriteIndex(spriteSheet *ebiten.Image, rects []image.Rectangle, loop boo
 		duration += intervals[i]
 	}
 
+	width := rects[0].Dx()
+	height := rects[0].Dy()
+
 	return &SpriteIndex{
 		images:    slice,
 		frames:    len(rects),
@@ -37,13 +43,19 @@ func NewSpriteIndex(spriteSheet *ebiten.Image, rects []image.Rectangle, loop boo
 		timer:     NewTimer(intervals[0]),
 		loop:      loop,
 		duration:  duration,
+		width:     width,
+		height:    height,
 	}
 }
 
-func NewHorizontalSpriteIndex(spriteSheet *ebiten.Image, width int, height int, frames int, loop bool, intervals []time.Duration) *SpriteIndex {
+func NewHorizontalSpriteIndex(spriteSheet *ebiten.Image, width int, height int, frames int, loop bool, intervals []time.Duration, skipFirstFrame bool) *SpriteIndex {
+	return NewHorizontalSpriteIndexWithOffset(spriteSheet, width, height, 0, 0, frames, loop, intervals, skipFirstFrame)
+}
+
+func NewHorizontalSpriteIndexWithOffset(spriteSheet *ebiten.Image, width int, height int, xOffset int, yOffset int, frames int, loop bool, intervals []time.Duration, skipFirstFrame bool) *SpriteIndex {
 	slice := make([]*ebiten.Image, frames)
 	for i := range frames {
-		rect := image.Rect(width*i, 0, width*(i+1), height)
+		rect := image.Rect(xOffset+width*i, yOffset, xOffset+width*(i+1), yOffset+height)
 		slice[i] = spriteSheet.SubImage(rect).(*ebiten.Image)
 	}
 
@@ -53,21 +65,50 @@ func NewHorizontalSpriteIndex(spriteSheet *ebiten.Image, width int, height int, 
 	}
 
 	return &SpriteIndex{
-		images:    slice,
-		frames:    frames,
-		intervals: intervals,
-		idx:       0,
-		timer:     NewTimer(intervals[0]),
-		loop:      loop,
-		duration:  duration,
+		images:         slice,
+		frames:         frames,
+		intervals:      intervals,
+		idx:            0,
+		timer:          NewTimer(intervals[0]),
+		loop:           loop,
+		duration:       duration,
+		width:          width,
+		height:         height,
+		skipFirstFrame: skipFirstFrame,
 	}
+}
+
+func (si *SpriteIndex) Dx() int {
+	return si.width
+}
+
+func (si *SpriteIndex) Dy() int {
+	return si.height
+}
+
+func (si *SpriteIndex) Frames() []*ebiten.Image {
+	return si.images
+}
+
+func (si *SpriteIndex) Index() int {
+	return si.idx
 }
 
 func (si *SpriteIndex) Reset() {
 	si.idx = 0
 }
 
+func (si *SpriteIndex) FirstFrame() *ebiten.Image {
+	return si.images[0]
+}
+
 func (si *SpriteIndex) NextFrame() *ebiten.Image {
+	// skip the first frame if configured
+	if si.skipFirstFrame && si.idx == 0 {
+		si.idx = 1
+		si.timer = NewTimer(si.intervals[si.idx])
+	}
+
 	// get the current frame
 	next := si.images[si.idx]
 	si.timer.Update()
@@ -77,6 +118,11 @@ func (si *SpriteIndex) NextFrame() *ebiten.Image {
 		if si.loop {
 			// move to the next frame
 			si.idx = (si.idx + 1) % si.frames
+
+			// skip the first frame if configured
+			if si.skipFirstFrame && si.idx == 0 {
+				si.idx = 1
+			}
 
 		} else {
 			si.idx = si.idx + 1
@@ -95,6 +141,7 @@ func (si *SpriteIndex) NextFrame() *ebiten.Image {
 }
 
 func (si *SpriteIndex) PreviousFrame() *ebiten.Image {
+	// TODO handle skipping the first frame
 	// get the current frame
 	previous := si.images[si.idx]
 	si.timer.Update()
@@ -124,4 +171,28 @@ type DirectionalSpriteIndex struct {
 	Down  *SpriteIndex
 	Left  *SpriteIndex
 	Right *SpriteIndex
+}
+
+func UniformFrameIntervals(duration time.Duration, count int) []time.Duration {
+	intervals := make([]time.Duration, count)
+	for i := range intervals {
+		intervals[i] = duration
+	}
+
+	return intervals
+}
+
+type SpriteSheetDescriptor struct {
+	Animations []SpriteSheetAnimationDescriptor `json:"animations"`
+}
+
+type SpriteSheetAnimationDescriptor struct {
+	Height         int    `json:"height"`
+	Width          int    `json:"width"`
+	Row            int    `json:"row"`
+	Frames         int    `json:"frames"`
+	Type           string `json:"type"`
+	Facing         string `json:"facing"`
+	Loop           bool   `json:"loop"`
+	SkipFirstFrame bool   `json:"skipFirstFrame"`
 }

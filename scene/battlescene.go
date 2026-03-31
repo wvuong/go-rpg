@@ -27,10 +27,10 @@ type BattleScene struct {
 }
 
 func NewBattleScene(config engine.GameConfig, state *engine.GameState, director *Director) *BattleScene {
-	blackWarriorIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Idle, 192, 192, 8, true, frameIntervals(100*time.Millisecond, 8))
-	blackWarriorRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Run, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6))
-	blackWarriorAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Attack, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4))
-	blackWarriorGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Guard, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6))
+	blackWarriorIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Idle, 192, 192, 8, true, frameIntervals(100*time.Millisecond, 8), false)
+	blackWarriorRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Run, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6), false)
+	blackWarriorAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Attack, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4), false)
+	blackWarriorGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackWarrior_Guard, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6), false)
 	blackWarriorSprite := engine.NewSprite2(blackWarriorIdleSpriteIndex.NextFrame(), false, 0)
 
 	blackWarriorAnimations := &engine.BattleAnimations{
@@ -40,10 +40,10 @@ func NewBattleScene(config engine.GameConfig, state *engine.GameState, director 
 		Guard:     blackWarriorGuardSpriteIndex,
 	}
 
-	blueWarriorIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Idle, 192, 192, 8, true, frameIntervals(100*time.Millisecond, 8))
-	blueWarriorRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Run, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6))
-	blueWarriorAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Attack, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4))
-	blueWarriorGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Guard, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6))
+	blueWarriorIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Idle, 192, 192, 8, true, frameIntervals(100*time.Millisecond, 8), false)
+	blueWarriorRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Run, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6), false)
+	blueWarriorAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Attack, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4), false)
+	blueWarriorGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlueWarrior_Guard, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6), false)
 	blueWarriorSprite := engine.NewSprite2(blueWarriorIdleSpriteIndex.NextFrame(), true, 0)
 
 	blueWarriorAnimations := &engine.BattleAnimations{
@@ -53,9 +53,9 @@ func NewBattleScene(config engine.GameConfig, state *engine.GameState, director 
 		Guard:     blueWarriorGuardSpriteIndex,
 	}
 
-	blackArcherIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Idle, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6))
-	blackArcherRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Run, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4))
-	blackArcherAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Attack, 192, 192, 8, false, frameIntervals(150*time.Millisecond, 8))
+	blackArcherIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Idle, 192, 192, 6, true, frameIntervals(100*time.Millisecond, 6), false)
+	blackArcherRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Run, 192, 192, 4, true, frameIntervals(100*time.Millisecond, 4), false)
+	blackArcherAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackArcher_Attack, 192, 192, 8, false, frameIntervals(150*time.Millisecond, 8), false)
 	blackArcherSprite := engine.NewSprite2(blackArcherIdleSpriteIndex.NextFrame(), false, 0)
 
 	blackArcherAnimations := &engine.BattleAnimations{
@@ -64,10 +64,10 @@ func NewBattleScene(config engine.GameConfig, state *engine.GameState, director 
 		AttackOne: blackArcherAttackSpriteIndex,
 	}
 
-	blackLancerIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Idle, 320, 320, 12, true, frameIntervals(100*time.Millisecond, 12))
-	blackLancerRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Run, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6))
-	blackLancerAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Attack, 320, 320, 3, true, frameIntervals(100*time.Millisecond, 3))
-	blackLancerGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Guard, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6))
+	blackLancerIdleSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Idle, 320, 320, 12, true, frameIntervals(100*time.Millisecond, 12), false)
+	blackLancerRunSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Run, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6), false)
+	blackLancerAttackSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Attack, 320, 320, 3, true, frameIntervals(100*time.Millisecond, 3), false)
+	blackLancerGuardSpriteIndex := engine.NewHorizontalSpriteIndex(assets.BlackLancer_Guard, 320, 320, 6, true, frameIntervals(100*time.Millisecond, 6), false)
 	blackLancerSprite := engine.NewSprite2(blackLancerIdleSpriteIndex.NextFrame(), false, 0)
 
 	blackLancerAnimations := &engine.BattleAnimations{
