@@ -155,11 +155,16 @@ func (bs *BattleScene) Attack() {
 	backwardRunningSpeed := 10.0
 	ticksNeeded := int(distance / forwardRunningSpeed)
 
+	actions = append(actions, &step{
+		action: func() {
+			left.SetState(engine.BattlerRunning)
+		},
+	})
+
 	// move left battler towards right battler
 	for range ticksNeeded {
 		action := &step{
 			action: func() {
-				left.SetState(engine.BattlerRunning)
 				left.MoveX(forwardRunningSpeed)
 			},
 		}

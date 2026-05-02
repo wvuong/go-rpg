@@ -69,8 +69,11 @@ func (b *Battler) MoveX(delta float64) {
 	b.sprite.ScreenPosition.X += delta
 }
 
-func (b *Battler) SetState(state BattlerState) {
+func (b *Battler) ResetAnimation() {
 	b.spriteIndex.Reset()
+}
+
+func (b *Battler) SetState(state BattlerState) {
 	b.state = state
 }
 
