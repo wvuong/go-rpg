@@ -3,12 +3,16 @@ package assets
 import (
 	"embed"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"image"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/lafriks/go-tiled"
@@ -41,6 +45,9 @@ var (
 	BlackLancer_Attack *ebiten.Image
 	BlackLancer_Guard  *ebiten.Image
 
+	LpcSpriteNames []string
+	LpcSpritesMap  map[string]*engine.LpcSpriteIndex
+
 	TileMaps map[string]*engine.TileMap
 )
 
@@ -69,6 +76,8 @@ func MustLoadAssets() {
 
 	levelLoader := newTileMapLoader()
 	TileMaps = levelLoader.MustLoadTileMaps()
+
+	mustLoadLpcSprites()
 }
 
 func mustLoadImage(name string) *ebiten.Image {
@@ -209,4 +218,74 @@ func (l *tileMapLoader) MustLoadTileMap(path string) *engine.TileMap {
 	}
 
 	return engine.NewTileMap(tileImages, layers, impassable, tileMap.Width, tileMap.Height, tileMap.TileWidth)
+}
+
+func mustLoadLpcSprites() {
+	fs := os.DirFS("assets")
+	files, err := os.ReadDir("assets/lpc")
+	if err != nil {
+		panic("Could not read directory")
+	}
+
+	fileNames := make([]string, 0)
+	LpcSpriteNames = make([]string, 0)
+	for _, file := range files {
+		if file.Type().IsRegular() && strings.HasSuffix(file.Name(), "-spritesheet.png") {
+			fileNames = append(fileNames, file.Name())
+			name := strings.TrimSuffix(file.Name(), "-spritesheet.png")
+			LpcSpriteNames = append(LpcSpriteNames, name)
+			log.Println("Found LPC sprite sheet", file.Name())
+		}
+	}
+
+	jsonBytes, err := MustLoadJson(fs, "lpc/spritesheet.json")
+	if err != nil {
+		panic("Could not load json")
+	}
+
+	var descriptor engine.SpriteSheetDescriptor
+	err = json.Unmarshal(jsonBytes, &descriptor)
+	if err != nil {
+		panic("Could not unmarshall json")
+	}
+
+	LpcSpritesMap := make(map[string]*engine.LpcSpriteIndex)
+
+	for _, t := range fileNames {
+		img := MustLoadImage(fs, "lpc/"+t)
+
+		spriteIndexes := make([]*engine.SpriteIndex, 0)
+		spriteNames := make([]string, 0)
+		lpcSpriteIndex := &engine.LpcSpriteIndex{}
+
+		for _, animation := range descriptor.Animations {
+			si := engine.NewHorizontalSpriteIndexWithOffset(img, animation.Width, animation.Height,
+				0, animation.Row*animation.Height,
+				animation.Frames, animation.Loop,
+				engine.UniformFrameIntervals(100*time.Millisecond, animation.Frames),
+				animation.SkipFirstFrame)
+			spriteIndexes = append(spriteIndexes, si)
+			spriteNames = append(spriteNames, animation.Type+" "+animation.Facing)
+			log.Println(t, animation.Type, animation.Facing)
+
+			switch animation.Type {
+			case "WALK":
+				switch animation.Facing {
+				case "UP":
+					lpcSpriteIndex.WalkUp = si
+				case "DOWN":
+					lpcSpriteIndex.WalkDown = si
+				case "LEFT":
+					lpcSpriteIndex.WalkLeft = si
+				case "RIGHT":
+					lpcSpriteIndex.WalkRight = si
+				}
+			case "DEATH":
+				lpcSpriteIndex.HurtDeath = si
+			}
+		}
+
+		LpcSpritesMap[t] = lpcSpriteIndex
+		log.Println("Sprite sheet", t, "loaded", len(spriteIndexes), "animations")
+	}
 }

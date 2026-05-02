@@ -173,6 +173,14 @@ type DirectionalSpriteIndex struct {
 	Right *SpriteIndex
 }
 
+type LpcSpriteIndex struct {
+	WalkUp    *SpriteIndex
+	WalkLeft  *SpriteIndex
+	WalkDown  *SpriteIndex
+	WalkRight *SpriteIndex
+	HurtDeath *SpriteIndex
+}
+
 func UniformFrameIntervals(duration time.Duration, count int) []time.Duration {
 	intervals := make([]time.Duration, count)
 	for i := range intervals {
