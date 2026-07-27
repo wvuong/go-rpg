@@ -115,6 +115,16 @@
             "type": "SWING_RIGHT",
             "facing": "RIGHT",
             "loop": true
+        },
+        {
+            "height": 64,
+            "width": 64,
+            "row": 11,
+            "frames": 3,
+            "type": "IDLE",
+            "facing": "RIGHT",
+            "loop": true,
+            "specificFrames": [4, 5, 6]
         }
     ]
 }

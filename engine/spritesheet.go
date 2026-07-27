@@ -203,4 +203,5 @@ type SpriteSheetAnimationDescriptor struct {
 	Facing         string `json:"facing"`
 	Loop           bool   `json:"loop"`
 	SkipFirstFrame bool   `json:"skipFirstFrame"`
+	SpecificFrames []int  `json:"specificFrames,omitempty"`
 }

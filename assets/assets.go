@@ -259,11 +259,15 @@ func mustLoadLpcSprites() {
 		lpcSpriteIndex := &engine.LpcSpriteIndex{}
 
 		for _, animation := range descriptor.Animations {
-			si := engine.NewHorizontalSpriteIndexWithOffset(img, animation.Width, animation.Height,
-				0, animation.Row*animation.Height,
+			yOffset := animation.Row * animation.Height
+
+			si := engine.NewHorizontalSpriteIndexWithOffset(img,
+				animation.Width, animation.Height,
+				0, yOffset,
 				animation.Frames, animation.Loop,
 				engine.UniformFrameIntervals(100*time.Millisecond, animation.Frames),
 				animation.SkipFirstFrame)
+
 			spriteIndexes = append(spriteIndexes, si)
 			spriteNames = append(spriteNames, animation.Type+" "+animation.Facing)
 			log.Println(t, animation.Type, animation.Facing)
