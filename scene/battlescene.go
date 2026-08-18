@@ -130,6 +130,35 @@ type step struct {
 	action func()
 }
 
+// busy reports whether an action sequence is still draining. Starting a new one
+// while this is true would discard the remaining steps, and those trailing steps
+// are what restore state: the attacker's snap back to its start position, or the
+// removal of a spent arrow.
+func (bs *BattleScene) busy() bool {
+	return len(bs.steps) > 0
+}
+
+// advanceSteps executes at most one queued step, called once per tick. A step
+// with no timer runs immediately; a step with a timer blocks the queue until it
+// is ready.
+func (bs *BattleScene) advanceSteps() {
+	if !bs.busy() {
+		return
+	}
+
+	next := bs.steps[0]
+
+	if next.timer != nil {
+		next.timer.Update()
+		if !next.timer.IsReady() {
+			return
+		}
+	}
+
+	next.action()
+	bs.steps = bs.steps[1:]
+}
+
 func (bs *BattleScene) ChangeState(state engine.BattlerState) {
 	left1 := bs.battlers[0]
 	left1.SetState(state)
@@ -145,6 +174,10 @@ func (bs *BattleScene) ChangeState(state engine.BattlerState) {
 }
 
 func (bs *BattleScene) Attack() {
+	if bs.busy() {
+		return
+	}
+
 	actions := make([]*step, 0)
 	left := bs.battlers[0]
 	right := bs.battlers[1]
@@ -226,6 +259,10 @@ func (bs *BattleScene) Attack() {
 }
 
 func (bs *BattleScene) FireArrow() {
+	if bs.busy() {
+		return
+	}
+
 	actions := make([]*step, 0)
 	archer := bs.battlers[2]
 	startX := archer.Position().X
@@ -296,8 +333,9 @@ func (bs *BattleScene) FireArrow() {
 	// delete the arrow
 	actions = append(actions, &step{
 		action: func() {
-			idx := slices.Index(bs.arrows, arrow)
-			bs.arrows = slices.Delete(bs.arrows, idx, idx+1)
+			if idx := slices.Index(bs.arrows, arrow); idx >= 0 {
+				bs.arrows = slices.Delete(bs.arrows, idx, idx+1)
+			}
 		},
 	})
 
@@ -340,26 +378,7 @@ func (bs *BattleScene) Update() {
 	}
 
 	// we execute one step per tick
-	// execute the next pending step
-	for _, step := range bs.steps {
-		if step.timer == nil {
-			step.action()
-			bs.steps = bs.steps[1:]
-			break
-
-		} else {
-			// if the step has a timer, we need to wait until the timer is ready before executing the action
-			step.timer.Update()
-			if step.timer.IsReady() {
-				step.action()
-				bs.steps = bs.steps[1:]
-				break
-
-			} else {
-				break
-			}
-		}
-	}
+	bs.advanceSteps()
 
 	// tick battlers
 	for _, battler := range bs.battlers {
