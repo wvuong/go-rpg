@@ -221,24 +221,24 @@ func (l *tileMapLoader) MustLoadTileMap(path string) *engine.TileMap {
 }
 
 func mustLoadLpcSprites() {
-	fs := os.DirFS("assets")
+	assetsDir := os.DirFS("assets")
 	files, err := os.ReadDir("assets/lpc")
 	if err != nil {
 		panic("Could not read directory")
 	}
 
-	fileNames := make([]string, 0)
+	fileNames := make(map[string]string)
 	LpcSpriteNames = make([]string, 0)
 	for _, file := range files {
 		if file.Type().IsRegular() && strings.HasSuffix(file.Name(), "-spritesheet.png") {
-			fileNames = append(fileNames, file.Name())
 			name := strings.TrimSuffix(file.Name(), "-spritesheet.png")
+			fileNames[name] = file.Name()
 			LpcSpriteNames = append(LpcSpriteNames, name)
 			log.Println("Found LPC sprite sheet", file.Name())
 		}
 	}
 
-	jsonBytes, err := MustLoadJson(fs, "lpc/spritesheet.json")
+	jsonBytes, err := MustLoadJson(assetsDir, "lpc/spritesheet.json")
 	if err != nil {
 		panic("Could not load json")
 	}
@@ -249,13 +249,14 @@ func mustLoadLpcSprites() {
 		panic("Could not unmarshall json")
 	}
 
-	LpcSpritesMap := make(map[string]*engine.LpcSpriteIndex)
+	// Assign, don't declare: a := here would shadow the package-level map and
+	// leave assets.LpcSpritesMap nil for every consumer.
+	LpcSpritesMap = make(map[string]*engine.LpcSpriteIndex, len(fileNames))
 
-	for _, t := range fileNames {
-		img := MustLoadImage(fs, "lpc/"+t)
+	for _, name := range LpcSpriteNames {
+		img := MustLoadImage(assetsDir, "lpc/"+fileNames[name])
 
 		spriteIndexes := make([]*engine.SpriteIndex, 0)
-		spriteNames := make([]string, 0)
 		lpcSpriteIndex := &engine.LpcSpriteIndex{}
 
 		for _, animation := range descriptor.Animations {
@@ -269,8 +270,7 @@ func mustLoadLpcSprites() {
 				animation.SkipFirstFrame)
 
 			spriteIndexes = append(spriteIndexes, si)
-			spriteNames = append(spriteNames, animation.Type+" "+animation.Facing)
-			log.Println(t, animation.Type, animation.Facing)
+			log.Println(name, animation.Type, animation.Facing)
 
 			switch animation.Type {
 			case "WALK":
@@ -289,7 +289,10 @@ func mustLoadLpcSprites() {
 			}
 		}
 
-		LpcSpritesMap[t] = lpcSpriteIndex
-		log.Println("Sprite sheet", t, "loaded", len(spriteIndexes), "animations")
+		// Keyed by the trimmed name so LpcSpriteNames can be used to look sheets up.
+		LpcSpritesMap[name] = lpcSpriteIndex
+		log.Println("Sprite sheet", name, "loaded", len(spriteIndexes), "animations")
 	}
+
+	log.Println("Loaded", len(LpcSpritesMap), "LPC sprite sheets")
 }
