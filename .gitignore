@@ -18,8 +18,12 @@ vendor/
 .env
 
 # IDE-related files and directories (common examples)
-.idea/		# for GoLand/IntelliJ
-.vscode/	# for VS Code
+# Keep comments on their own line: git only treats # as a comment at the start
+# of a line, so a trailing "# note" becomes part of the pattern and matches nothing.
+# for GoLand/IntelliJ
+.idea/
+# for VS Code
+.vscode/
 .history/
 *.swp
 
