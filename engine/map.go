@@ -33,11 +33,15 @@ func NewTileMap(tileImages []*ebiten.Image, layers [][]int, impassable []int, co
 }
 
 func (m *TileMap) getTile(layer int, col int, row int) int {
-	if col >= m.cols || row >= m.rows {
+	if !m.inBounds(col, row) {
 		return 0
 	}
 
 	return m.layers[layer][row*m.cols+col]
+}
+
+func (m *TileMap) inBounds(col int, row int) bool {
+	return col >= 0 && col < m.cols && row >= 0 && row < m.rows
 }
 
 // called by player
@@ -45,8 +49,14 @@ func (m *TileMap) isSolidTileAtXY(x float64, y float64) bool {
 	col := m.getCol(x)
 	row := m.getRow(y)
 
-	idx := row*m.cols + col
-	return m.impassable[idx] == 1
+	// Anything off the map counts as solid so the player is stopped at the edge.
+	// Without this the flattened index either panics or silently wraps onto the
+	// neighbouring row and reads an unrelated tile.
+	if !m.inBounds(col, row) {
+		return true
+	}
+
+	return m.impassable[row*m.cols+col] == 1
 }
 
 // called by player

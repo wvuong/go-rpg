@@ -1,8 +1,6 @@
 package engine
 
 import (
-	"math"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -53,12 +51,21 @@ func (p *Player) Update() {
 	p.Position.X += dirX
 	p.Position.Y += dirY
 
+	halfW := float64(p.Sprite.Dx) / 2
+	halfH := float64(p.Sprite.Dy) / 2
+
+	// Clamp to map bounds before deriving the bounding box. Position is the sprite
+	// centre, so the limits are inset by half the sprite — clamping to [0, mapWidth]
+	// would still leave the box hanging half a sprite off the map.
+	p.Position.X = ClampFloat64(p.Position.X, halfW, float64(p.tileMap.mapWidth)-halfW)
+	p.Position.Y = ClampFloat64(p.Position.Y, halfH, float64(p.tileMap.mapHeight)-halfH)
+
 	// check for collisions at new player position
 	// calculate the player's bounding box
-	left := p.Position.X - float64(p.Sprite.Dx)/2
-	right := p.Position.X + float64(p.Sprite.Dx)/2 - 1
-	top := p.Position.Y - float64(p.Sprite.Dy)/2
-	bottom := p.Position.Y + float64(p.Sprite.Dy)/2 - 1
+	left := p.Position.X - halfW
+	right := p.Position.X + halfW - 1
+	top := p.Position.Y - halfH
+	bottom := p.Position.Y + halfH - 1
 
 	// store the bounding box values
 	p.Left = left
@@ -78,30 +85,24 @@ func (p *Player) Update() {
 			// moving down
 			row := p.tileMap.getRow(bottom)
 			// align player to top edge of tile
-			p.Position.Y = -float64(p.Sprite.Dy)/2 + p.tileMap.getY(row)
+			p.Position.Y = -halfH + p.tileMap.getY(row)
 		} else if dirY < 0 {
 			// moving up
 			row := p.tileMap.getRow(top)
 			// align player to bottom edge of tile
-			p.Position.Y = float64(p.Sprite.Dy)/2 + p.tileMap.getY(row+1)
+			p.Position.Y = halfH + p.tileMap.getY(row+1)
 		} else if dirX > 0 {
 			// moving right
 			col := p.tileMap.getCol(right)
 			// align player to left edge of tile
-			p.Position.X = -float64(p.Sprite.Dx)/2 + p.tileMap.getX(col)
+			p.Position.X = -halfW + p.tileMap.getX(col)
 		} else if dirX < 0 {
 			// moving left
 			col := p.tileMap.getCol(left)
 			// align player to right edge of tile
-			p.Position.X = float64(p.Sprite.Dx)/2 + p.tileMap.getX(col+1)
+			p.Position.X = halfW + p.tileMap.getX(col+1)
 		}
 	}
-
-	// clamp player position to map bounds
-	x := math.Max(0, math.Min(p.Position.X, float64(p.tileMap.mapWidth)))
-	y := math.Max(0, math.Min(p.Position.Y, float64(p.tileMap.mapHeight)))
-	p.Position.X = x
-	p.Position.Y = y
 
 	// update animation based on movement direction
 	if dirY < 0 {
